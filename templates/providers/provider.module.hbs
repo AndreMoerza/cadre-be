@@ -1,0 +1,11 @@
+import { Module } from '@nestjs/common';
+import { {{pascalModName}}QueueProvider } from './queue/index.provider';
+import { {{pascalModName}}CacheProvider } from './cache/index.provider';
+import { {{pascalModName}}JobsProvider } from './jobs/index.provider';
+
+@Module({
+  imports: [],
+  providers: [{{pascalModName}}QueueProvider, {{pascalModName}}CacheProvider, {{pascalModName}}JobsProvider],
+  exports: [{{pascalModName}}QueueProvider, {{pascalModName}}CacheProvider, {{pascalModName}}JobsProvider],
+})
+export class {{pascalModName}}ProviderModule {}

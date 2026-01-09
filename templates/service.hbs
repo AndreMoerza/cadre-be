@@ -1,0 +1,27 @@
+import { Injectable } from '@nestjs/common';
+import { FindManyOptions, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { AppCountedResult } from '@app/interfaces/index.type';
+
+@Injectable()
+export class {{pascalModName}}Service {
+  constructor(
+    // an example of injecting repository
+    // @InjectRepository({{pascalModName}})
+    // private readonly userRepository: Repository<{{pascalModName}}>,
+  ) {}
+
+  get{{pascalModName}}s(opts /** opts: FindManyOptions<{{pascalModName}}> */) 
+  /** : AppCountedResult<{{pascalModName}}> */ {
+    // return this.userRepository.findAndCount(opts);
+    throw new Error('Not implemented');
+  }
+
+  get{{pascalModName}}(id /** : string */) 
+  /** :Promise<{{pascalModName}}> */ {
+    // return this.userRepository.findOne({
+    //  where: { id },
+    // });
+    throw new Error('Not implemented');
+  }
+}

@@ -1,0 +1,32 @@
+import { Controller, Param } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { {{pascalModName}}Service } from './{{lowerModName}}.service';
+import { AppGet } from '@app/decorators/app.decorator';
+import { Pagination } from '@app/decorators/pagination.decorator';
+import { PaginatedParams } from '@app/interfaces/index.type';
+
+@ApiTags({{apiTags}})
+@Controller({
+  path: '{{lowerModName}}',
+  version: '1',
+})
+export class {{pascalModName}}Controller {
+  constructor(private readonly {{lowerModName}}Service: {{pascalModName}}Service) {}
+
+  @AppGet('', {
+    paginated: true,
+    summary: 'Get all {{lowerModName}}',
+  })
+  async get{{pascalModName}}s(@Pagination() pagination: PaginatedParams) {
+    const result = await this.{{lowerModName}}Service.get{{pascalModName}}s(pagination);
+    return result;
+  }
+
+  @AppGet(':id', {
+    summary: 'Get specific {{lowerModName}} by id',
+  })
+  async get{{pascalModName}}(@Param('id') id: string) {
+    const result = await this.{{lowerModName}}Service.get{{pascalModName}}(id);
+    return result;
+  }
+}

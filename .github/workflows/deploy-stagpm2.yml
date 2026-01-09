@@ -1,0 +1,73 @@
+name: Deploy to DO with PM2 using PAT (stag)
+on:
+  push:
+    branches:
+      - stag
+  pull_request:
+    branches:
+      - stag
+    types: [closed]
+jobs:
+  deploy_stag:
+    name: Deploy to DO with PM2
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-22.04
+    env:
+      BRANCH: ${{ github.ref_name }}
+      SERVICE: ${{ github.repository }}-${{ github.ref_name }}
+      REPO: native-productions/${{ github.repository }}
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Install SSH key
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.DO_DEV_SERVER_PRIVATE_KEY }}
+
+      - name: Deploy to DO
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.DO_DEV_SERVER_USERNAME }}@${{ secrets.DO_DEV_SERVER_IP }} << EOF
+          set -e
+
+          nvm use 18.20
+          cd projects/clients
+
+          if [ -d "${{ env.SERVICE }}" ]; then
+            echo "folder ${{ env.SERVICE }} exists"
+            cd ${{ env.SERVICE }}
+            git pull origin ${{ env.BRANCH }}
+          else
+            echo "folder ${{ env.SERVICE }} does not exist"
+            git clone --branch ${{ env.BRANCH }} https://${{ secrets.PAT }}@github.com/${{ env.REPO }}.git ${{ env.SERVICE }}
+            cd ${{ env.SERVICE }}
+          fi
+
+          # Create the .env file with the STAG_ENV value
+          echo "Creating .env file."
+          echo "${{ secrets.STAG_ENV }}" > .env
+
+          # Verify that the .env file was created and is not empty
+          if [ -f ".env" ] && [ -s ".env" ]; then
+              echo ".env file created successfully with content."
+          else
+              echo "Failed to create .env file or the file is empty." && exit 1
+          fi
+
+          npm ci
+
+          # Prepare migration database
+          npm run migration:pending
+
+          npm run build
+
+          if pm2 list | grep -q "${{ env.SERVICE }}"; then
+            echo "PM2 service '${{ env.SERVICE }}' is already running. Restarting it."
+            pm2 restart ${{ env.SERVICE }} --update-env
+          else
+            echo "Starting PM2 service '${{ env.SERVICE }}'."
+            pm2 start dist/src/main.js --name ${{ env.SERVICE }} -i 2 --env .env --update-env
+          fi
+
+          pm2 save
+          EOF
