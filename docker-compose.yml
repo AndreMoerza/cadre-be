@@ -6,7 +6,7 @@ services:
     ports:
       - '5432:5432'
     environment:
-      POSTGRES_DB: poll_db
+      POSTGRES_DB: merdeka
       POSTGRES_USER: poll_user
       POSTGRES_PASSWORD: poll_password
     volumes:
