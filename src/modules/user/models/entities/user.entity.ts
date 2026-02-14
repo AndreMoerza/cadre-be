@@ -1,5 +1,6 @@
 import { BaseAppEntity } from '@app/db/base/base.entity';
-import { Column, Entity, Index, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, Index, ManyToOne } from 'typeorm';
+import { Role } from '@app/modules/role/models/entities/role.entity';
 import * as bcrypt from 'bcrypt';
 @Entity({ name: 'users' })
 export class User extends BaseAppEntity {
@@ -15,6 +16,9 @@ export class User extends BaseAppEntity {
 
   @Column({ type: 'text', nullable: true })
   phone?: string | null;
+
+  @ManyToOne(() => Role, (role) => role.id)
+  role: Role;
 
   validateUserPassword(passwordInput: string) {
     if (!passwordInput) {

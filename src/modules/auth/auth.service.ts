@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AuthorizeDto } from './common/dtos/authorize.dto';
 import { CrudService } from '@app/lib/crud.lib';
 import { Auth } from './models/entities/auth.entity';
@@ -8,7 +8,6 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../user/models/entities/user.entity';
 import * as _ from 'lodash';
-import { Permission } from '@app/interfaces/index.type';
 import { withTransaction } from '@app/utils/db.util';
 import { v4 } from 'uuid';
 import { InjectQueue } from '@nestjs/bullmq';
@@ -43,7 +42,7 @@ export class AuthService extends CrudService<Auth> {
       const user = await this.userRepository.findOne({
         where: {
           email: dto.email,
-        }
+        },
       });
 
       if (!user) {

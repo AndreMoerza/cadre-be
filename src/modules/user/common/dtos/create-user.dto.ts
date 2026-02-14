@@ -1,4 +1,6 @@
 import { SWAGGER_SAMPLES } from '@app/constants/app.constant';
+import { MediaFile } from '@app/modules/file/models/entities/file.entity';
+import { Role } from '@app/modules/role/models/entities/role.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional } from 'class-validator';
 
@@ -26,4 +28,17 @@ export class CreateUserDto {
   })
   @IsOptional()
   phone: string;
+
+  @ApiProperty({
+    type: () => Role,
+  })
+  @IsNotEmpty()
+  role: Role;
+
+  @ApiProperty({
+    example: SWAGGER_SAMPLES.id,
+    description: 'image file ID',
+  })
+  @IsOptional()
+  image?: MediaFile;
 }

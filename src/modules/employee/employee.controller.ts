@@ -1,4 +1,10 @@
-import { Body, Controller, Param, UploadedFile, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Param,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { EmployeeService } from './employee.service';
 import { AppDel, AppGet, AppPost, AppPut } from '@app/decorators/app.decorator';
@@ -25,7 +31,7 @@ export class EmployeeController {
     private readonly employeeJobsQueue: Queue,
     @InjectQueue('employee-import')
     private readonly employeeImportQueue: Queue,
-  ) { }
+  ) {}
 
   @AppPost('', {
     summary: 'Register employee',
@@ -81,7 +87,7 @@ export class EmployeeController {
   @ApiConsumes(API_CONSUMES.FORM_DATA)
   async importCsv(
     @UploadedFile() file: Express.Multer.File,
-    @Body() _: UploadFileDto
+    @Body() _: UploadFileDto,
   ) {
     const job = await this.employeeImportQueue.add('import-csv', {
       filePath: file.path,
@@ -113,7 +119,9 @@ export class EmployeeController {
     const progress =
       typeof rawProgress === 'number'
         ? rawProgress
-        : typeof rawProgress === 'object' && rawProgress !== null && 'value' in rawProgress
+        : typeof rawProgress === 'object' &&
+            rawProgress !== null &&
+            'value' in rawProgress
           ? Number((rawProgress as any).value) || 0
           : 0;
 
@@ -125,5 +133,4 @@ export class EmployeeController {
       ...(state === 'failed' ? { failedReason: job.failedReason } : {}),
     };
   }
-
 }
