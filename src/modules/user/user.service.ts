@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { FindManyOptions, Not, Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
 import { User } from './models/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppCountedResult } from '@app/interfaces/index.type';
@@ -7,8 +7,6 @@ import { withTransaction } from '@app/utils/db.util';
 import { v4 } from 'uuid';
 import { CreateUserDto } from './common/dtos/create-user.dto';
 import { Role } from '../role/models/entities/role.entity';
-import { RoleHasPermission } from '../role/models/entities/role-has-permission.entity';
-import { RolePermission } from '../role/models/entities/role-permission.entity';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from '../auth/auth.service';
 import * as _ from 'lodash';
@@ -23,9 +21,6 @@ export class UserService {
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
 
-    @InjectRepository(RolePermission)
-    private readonly rolePermissionRepository: Repository<RolePermission>,
-
     private readonly authService: AuthService,
   ) {}
 
@@ -33,7 +28,6 @@ export class UserService {
     const result = await this.userRepository.findAndCount({
       ...opts,
       relations: {
-        image: true,
         role: true,
       },
       where: {
@@ -47,7 +41,6 @@ export class UserService {
   getUser(id: string): Promise<User> {
     return this.userRepository.findOne({
       relations: {
-        image: true,
         role: true,
       },
       where: { id },
@@ -75,26 +68,10 @@ export class UserService {
         if (!dto.role) {
           role = new Role();
           role.name = `super_admin`;
-          role.description = `Super admin role for ${dto.email}, with this role you can manage all the data`;
+          role.description = `Super admin role, with this role you can manage all the data`;
           role.icon = `🔥`;
 
-          const rp = await this.rolePermissionRepository.find({
-            where: {
-              feature: Not('*'),
-            },
-          });
-
-          // it's a super admin, so we need to give all permission
-          const roleHasPermission = rp.map((item) => {
-            const rhp = new RoleHasPermission();
-            rhp.id = v4();
-            rhp.permission = item;
-            rhp.role = role;
-            return rhp;
-          });
-
           await manager.save(Role, role);
-          await manager.save(RoleHasPermission, roleHasPermission);
         } else {
           role = { id: dto.role?.id } as Role;
         }
@@ -103,7 +80,6 @@ export class UserService {
         user.name = dto.name;
         user.email = dto.email;
         user.phone = dto.phone;
-        user.image = dto.image;
         const newPass = await bcrypt.hash(dto.password, 10);
         user.passwordHash = newPass;
         user.role = role;
@@ -139,7 +115,6 @@ export class UserService {
         id,
       },
       relations: {
-        image: true,
         role: true,
       },
     });

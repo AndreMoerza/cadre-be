@@ -16,4 +16,4 @@ import { ProductTypeJobsProvider } from './jobs/index.provider';
     ProductTypeJobsProvider,
   ],
 })
-export class ProductTypeProviderModule {}
+export class CategoryProviderModule {}

@@ -1,7 +1,6 @@
 // this entity file is the typeorm entity, you can add your own fields here
 import { BaseAppEntity } from '@app/db/base/base.entity';
-import { Column, Entity, Index, OneToMany } from 'typeorm';
-import { RoleHasPermission } from './role-has-permission.entity';
+import { Column, Entity, Index } from 'typeorm';
 
 @Entity('role')
 export class Role extends BaseAppEntity {
@@ -23,10 +22,4 @@ export class Role extends BaseAppEntity {
 
   @Column({ type: 'varchar', length: 5, nullable: false })
   icon: string;
-
-  @OneToMany(
-    () => RoleHasPermission,
-    (roleHasPermission) => roleHasPermission.role,
-  )
-  roleHasPermissions: RoleHasPermission[];
 }

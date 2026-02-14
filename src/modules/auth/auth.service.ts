@@ -114,6 +114,9 @@ export class AuthService extends CrudService<Auth> {
 
       const token = this.authLib.signUserToken({
         email: user.email,
+        role: {
+          sub: user?.role?.id || 'N/A',
+        },
         sub: user.id,
       });
 

@@ -1,6 +1,7 @@
-import { Entity, Column, Index, ManyToOne } from 'typeorm';
+import { Entity, Column, ManyToOne } from 'typeorm';
 import { BaseAppEntity } from '@app/db/base/base.entity';
-import { ProductType } from '@app/modules/productType/models/entities/productType.entity';
+import { Category } from '@app/modules/category/models/entities/category.entity';
+import { Brand } from '@app/modules/brand/models/entities/brand.entity';
 
 export enum ProductStatus {
   ACTIVE = 'ACTIVE',
@@ -9,16 +10,27 @@ export enum ProductStatus {
 }
 
 @Entity({ name: 'products' })
-@Index(['sku'], { unique: true })
 export class Product extends BaseAppEntity {
   @Column({ type: 'text' })
-  name!: string;
+  name: string;
 
-  @Column({ type: 'text' })
-  sku!: string;
+  @ManyToOne(() => Brand, (t) => t.products, {
+    nullable: true,
+    onDelete: 'RESTRICT',
+  })
+  brand: Brand;
 
   @Column({ type: 'numeric', precision: 14, scale: 2, default: 0 })
-  price!: string; // keep money precise as string in JS
+  price!: string;
+
+  @Column({ type: 'numeric', precision: 14, scale: 2, default: 0 })
+  salePrice!: string;
+
+  @Column({ type: 'numeric', default: 0 })
+  displayStock!: string;
+
+  @Column({ type: 'numeric', default: 0 })
+  realStock!: string;
 
   @Column({ type: 'text', nullable: true })
   description?: string | null;
@@ -26,9 +38,9 @@ export class Product extends BaseAppEntity {
   @Column({ type: 'enum', enum: ProductStatus, default: ProductStatus.ACTIVE })
   status!: ProductStatus;
 
-  @ManyToOne(() => ProductType, (t) => t.products, {
+  @ManyToOne(() => Category, (t) => t.products, {
     nullable: false,
     onDelete: 'RESTRICT',
   })
-  type!: ProductType;
+  category!: Category;
 }

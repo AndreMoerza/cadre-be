@@ -1,22 +1,22 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindManyOptions, Repository } from 'typeorm';
-import { ProductType } from './models/entities/productType.entity';
-import { CreateProductTypeDto } from './common/dtos/create-product-type.dto';
-import { UpdateProductTypeDto } from './common/dtos/update-product-type.dto';
+import { Category } from './models/entities/category.entity';
+import { CreateCategoryDto } from './common/dtos/create-category.dto';
+import { UpdateCategoryDto } from './common/dtos/update-category.dto';
 @Injectable()
-export class ProductTypeService {
+export class CategoryService {
   constructor(
-    @InjectRepository(ProductType)
-    private readonly repo: Repository<ProductType>,
+    @InjectRepository(Category)
+    private readonly repo: Repository<Category>,
   ) {}
 
-  create(dto: CreateProductTypeDto) {
+  create(dto: CreateCategoryDto) {
     const e = this.repo.create(dto);
     return this.repo.save(e);
   }
 
-  findAll(opts: FindManyOptions<ProductType>) {
+  findAll(opts: FindManyOptions<Category>) {
     return this.repo.findAndCount(opts);
   }
 
@@ -26,7 +26,7 @@ export class ProductTypeService {
     return e;
   }
 
-  async update(id: string, dto: UpdateProductTypeDto) {
+  async update(id: string, dto: UpdateCategoryDto) {
     const e = await this.findOne(id);
     Object.assign(e, dto);
     return this.repo.save(e);

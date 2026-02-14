@@ -1,14 +1,21 @@
 import { Body, Controller, Param } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { SaleService } from './sale.service';
-import { AppGet, AppPost } from '@app/decorators/app.decorator';
+import {
+  AppGet,
+  AppPost,
+  GuardAccessControl,
+  Me,
+} from '@app/decorators/app.decorator';
 import { CreateSaleDto } from './common/dtos/create-sale.dto';
+import { AppUser } from '@app/interfaces/index.type';
 
 @ApiTags()
 @Controller({
   path: 'sale',
   version: '1',
 })
+@GuardAccessControl()
 export class SaleController {
   constructor(private readonly saleService: SaleService) {}
 
@@ -32,8 +39,8 @@ export class SaleController {
   @AppPost('', {
     summary: 'Create product',
   })
-  async create(@Body() dto: CreateSaleDto) {
-    const result = await this.saleService.create(dto);
+  async create(@Body() dto: CreateSaleDto, @Me() me: AppUser) {
+    const result = await this.saleService.create(dto, me);
     return result;
   }
 }

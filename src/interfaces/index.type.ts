@@ -26,14 +26,14 @@ export type PaginatedParams = {
 
 export interface AppGetOpts<T = any> {
   paginated?:
-  | boolean
-  | {
-    page?: boolean;
-    limit?: boolean;
-    search?: boolean;
-    sort?: boolean;
-    populate?: boolean;
-  };
+    | boolean
+    | {
+        page?: boolean;
+        limit?: boolean;
+        search?: boolean;
+        sort?: boolean;
+        populate?: boolean;
+      };
   responseType?: T;
   summary?: string;
   auth?: boolean;
@@ -41,14 +41,14 @@ export interface AppGetOpts<T = any> {
 
 export interface AppPostOpts<T = any> {
   paginated?:
-  | boolean
-  | {
-    page?: boolean;
-    limit?: boolean;
-    search?: boolean;
-    sort?: boolean;
-    populate?: boolean;
-  };
+    | boolean
+    | {
+        page?: boolean;
+        limit?: boolean;
+        search?: boolean;
+        sort?: boolean;
+        populate?: boolean;
+      };
   responseType?: T;
   summary?: string;
   statusCode?: number;
@@ -58,6 +58,7 @@ export interface AppPostOpts<T = any> {
 export interface AppUser {
   sub: string;
   email: string;
+  role: { sub: string };
 }
 
 export type AppRequest = Request & { user: AppUser };

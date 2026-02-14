@@ -3,7 +3,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import appConfig from './configs/env/app.config';
 import dbConfig from './configs/env/db.config';
 import { LoggerModule } from 'nestjs-pino';
-import { UserModule } from './modules/user/user.module';
 import { DataSource } from 'typeorm';
 import { DatabaseConfig } from './db/typeorm.db';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -15,10 +14,11 @@ import { IsExist } from './validators/is-exists';
 import { BullModule } from '@nestjs/bullmq';
 import { ApplicationConfig } from './interfaces/config.type';
 import mailConfig from './configs/env/mail.config';
-import { EmployeeModule } from './modules/employee/employee.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-ioredis-yet';
-
+import { ProductModule } from './modules/product/product.module';
+import { SaleModule } from './modules/sale/sale.module';
+import { CategoryModule } from './modules/category/category.module';
 
 const libs = [
   ConfigModule.forRoot({
@@ -58,7 +58,8 @@ const libs = [
       } catch (error) {
         console.error(error);
         throw new Error(
-          `Failed to initialize the data source:: ${error?.message || 'UNKNOWN'
+          `Failed to initialize the data source:: ${
+            error?.message || 'UNKNOWN'
           }`,
         );
       }
@@ -90,13 +91,10 @@ const libs = [
   PassportModule,
 ];
 
-const modules = [
-  EmployeeModule,
-  AuthModule,
-];
+const modules = [CategoryModule, ProductModule, SaleModule, AuthModule];
 
 @Module({
   imports: [...libs, ...modules],
   providers: [IsExist],
 })
-export class AppModule { }
+export class AppModule {}

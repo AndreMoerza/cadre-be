@@ -4,7 +4,6 @@ import {
   ArrayNotEmpty,
   IsArray,
   IsDateString,
-  IsNotEmpty,
   IsOptional,
   IsString,
   IsUUID,
@@ -51,23 +50,9 @@ class PaymentInput {
 }
 
 export class CreateSaleDto {
-  @ApiProperty({ example: 'POS-2025-00001' })
-  @IsString()
-  @IsNotEmpty()
-  number!: string;
-
-  @ApiProperty({ example: 'uuid-of-branch' })
-  @IsUUID()
-  branchId!: string;
-
   @ApiProperty({ example: 'uuid-of-cashier' })
   @IsUUID()
   cashierId!: string;
-
-  @ApiProperty({ example: 'uuid-of-customer', required: false })
-  @IsUUID()
-  @IsOptional()
-  customerId?: string;
 
   @ApiProperty({ type: [SaleItemInput] })
   @IsArray()
@@ -75,13 +60,6 @@ export class CreateSaleDto {
   @ValidateNested({ each: true })
   @Type(() => SaleItemInput)
   items!: SaleItemInput[];
-
-  @ApiProperty({ type: [PaymentInput], required: false })
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => PaymentInput)
-  @IsOptional()
-  payments?: PaymentInput[];
 
   @ApiProperty({ example: '25.00' })
   @Matches(/^\d+(\.\d{1,2})?$/)

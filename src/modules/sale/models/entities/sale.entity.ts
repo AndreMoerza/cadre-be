@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne, OneToMany, Index } from 'typeorm';
+import { Entity, Column, ManyToOne, OneToMany } from 'typeorm';
 import { BaseAppEntity } from '@app/db/base/base.entity';
 import { User } from '@app/modules/user/models/entities/user.entity';
 import { SaleItem } from './sale-item.entity';
@@ -11,10 +11,6 @@ export enum SaleStatus {
 
 @Entity({ name: 'sales' })
 export class Sale extends BaseAppEntity {
-  @Index({ unique: true })
-  @Column({ type: 'text' })
-  number!: string; // e.g. POS-2025-00001
-
   @ManyToOne(() => User, { nullable: false, onDelete: 'RESTRICT' })
   cashier!: User;
 
