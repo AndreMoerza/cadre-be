@@ -28,7 +28,8 @@ import { UserFactoryModule } from './factories/user/user.factory.module';
         } catch (error) {
           console.error(error);
           throw new Error(
-            `Failed to initialize the data source:: ${error?.message || 'UNKNOWN'
+            `Failed to initialize the data source:: ${
+              error?.message || 'UNKNOWN'
             }`,
           );
         }
@@ -37,4 +38,4 @@ import { UserFactoryModule } from './factories/user/user.factory.module';
     }),
   ],
 })
-export class SeedModule { }
+export class SeedModule {}

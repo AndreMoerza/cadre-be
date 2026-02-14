@@ -19,11 +19,13 @@ import { redisStore } from 'cache-manager-ioredis-yet';
 import { ProductModule } from './modules/product/product.module';
 import { SaleModule } from './modules/sale/sale.module';
 import { CategoryModule } from './modules/category/category.module';
+import r2Config from './configs/env/r2.config';
+import { BrandModule } from './modules/brand/brand.module';
 
 const libs = [
   ConfigModule.forRoot({
     isGlobal: true,
-    load: [appConfig, dbConfig, awsConfig, redisConfig, mailConfig],
+    load: [appConfig, dbConfig, awsConfig, redisConfig, mailConfig, r2Config],
     envFilePath: ['.env'],
   }),
   LoggerModule.forRoot({
@@ -91,7 +93,13 @@ const libs = [
   PassportModule,
 ];
 
-const modules = [CategoryModule, ProductModule, SaleModule, AuthModule];
+const modules = [
+  BrandModule,
+  CategoryModule,
+  ProductModule,
+  SaleModule,
+  AuthModule,
+];
 
 @Module({
   imports: [...libs, ...modules],

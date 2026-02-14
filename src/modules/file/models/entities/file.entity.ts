@@ -1,8 +1,9 @@
 // this entity file is the typeorm entity, you can add your own fields here
 import { BaseAppEntity } from '@app/db/base/base.entity';
+import { ProductMedia } from '@app/modules/product/models/entities/product-media.entity';
 import { User } from '@app/modules/user/models/entities/user.entity';
 import { ApiResponseProperty } from '@nestjs/swagger';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity('file')
 export class MediaFile extends BaseAppEntity {
@@ -44,4 +45,7 @@ export class MediaFile extends BaseAppEntity {
     type: () => User,
   })
   updatedBy: User;
+
+  @OneToMany(() => ProductMedia, (pm) => pm.file)
+  productLinks: ProductMedia[];
 }

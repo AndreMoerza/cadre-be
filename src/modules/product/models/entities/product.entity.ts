@@ -1,7 +1,8 @@
-import { Entity, Column, ManyToOne } from 'typeorm';
+import { Entity, Column, ManyToOne, OneToMany } from 'typeorm';
 import { BaseAppEntity } from '@app/db/base/base.entity';
 import { Category } from '@app/modules/category/models/entities/category.entity';
 import { Brand } from '@app/modules/brand/models/entities/brand.entity';
+import { ProductMedia } from './product-media.entity';
 
 export enum ProductStatus {
   ACTIVE = 'ACTIVE',
@@ -43,4 +44,7 @@ export class Product extends BaseAppEntity {
     onDelete: 'RESTRICT',
   })
   category!: Category;
+
+  @OneToMany(() => ProductMedia, (pm) => pm.product, { cascade: true })
+  media: ProductMedia[];
 }

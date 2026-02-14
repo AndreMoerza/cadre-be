@@ -24,6 +24,14 @@ export interface AwsConfig {
   s3Bucket: string;
 }
 
+export interface R2Config {
+  endpoint: string;
+  accessKeyId: string;
+  secretAccessKey: string;
+  bucket: string;
+  publicBaseUrl: string;
+}
+
 export interface RedisConfig {
   host: string;
   port: number;
@@ -43,4 +51,5 @@ export interface ApplicationConfig {
   aws: AwsConfig;
   redis: RedisConfig;
   mail: MailConfig;
+  r2: R2Config;
 }

@@ -1,6 +1,6 @@
 import { Body, Controller, Param } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { ProductService } from './product.service';
+import { ProductService } from '../services/product.service';
 import {
   AppDel,
   AppGet,
@@ -10,8 +10,8 @@ import {
 } from '@app/decorators/app.decorator';
 import { Pagination } from '@app/decorators/pagination.decorator';
 import { PaginatedParams } from '@app/interfaces/index.type';
-import { CreateProductDto } from './common/dtos/create-product.dto';
-import { UpdateProductDto } from './common/dtos/update-product.dto';
+import { CreateProductDto } from '../common/dtos/create-product.dto';
+import { UpdateProductDto } from '../common/dtos/update-product.dto';
 
 @ApiTags()
 @Controller({
