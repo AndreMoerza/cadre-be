@@ -21,6 +21,7 @@ import { SaleModule } from './modules/sale/sale.module';
 import { CategoryModule } from './modules/category/category.module';
 import r2Config from './configs/env/r2.config';
 import { BrandModule } from './modules/brand/brand.module';
+import { FileModule } from './modules/file/file.module';
 
 const libs = [
   ConfigModule.forRoot({
@@ -99,6 +100,7 @@ const modules = [
   ProductModule,
   SaleModule,
   AuthModule,
+  FileModule,
 ];
 
 @Module({
