@@ -39,7 +39,14 @@ export class FileService {
     });
   }
 
+  private isPrivateKey(key?: string | null) {
+    return Boolean(key && key.startsWith('private/'));
+  }
+
   private publicUrl(key: string) {
+    // ✅ never generate public url for private objects
+    if (this.isPrivateKey(key)) return key;
+
     const base = this.r2.publicBaseUrl;
     return base ? `${base.replace(/\/$/, '')}/${key}` : key;
   }
@@ -55,23 +62,34 @@ export class FileService {
     });
   }
 
+  /**
+   * Resolve a usable URL for client:
+   * - if private flag OR key starts with private/ -> presigned
+   * - else -> public URL (base + key) or fallback to stored path
+   */
+  private async resolvePath(file: MediaFile): Promise<string> {
+    const key = file.key ?? undefined;
+
+    // Treat as private if DB says private OR the key indicates private
+    const treatPrivate = Boolean(file.private) || this.isPrivateKey(key);
+
+    if (treatPrivate) {
+      if (!key) return file.path ?? ''; // fallback if old data
+      return this.getPresignedUrl(key, file.bucket ?? undefined);
+    }
+
+    // public
+    if (key) return file.path || this.publicUrl(key);
+    return file.path ?? '';
+  }
+
   async getFiles(opts: FindManyOptions<MediaFile>) {
     const [files, count] = await this.fileRepository.findAndCount(opts);
 
     const result = await Promise.all(
       files.map(async (file) => {
-        // private -> presign
-        if (file.private && file.key) {
-          const url = await this.getPresignedUrl(file.key, file.bucket);
-          return { ...file, path: url };
-        }
-
-        // public -> ensure path is public url (if key exists)
-        if (!file.private && file.key) {
-          return { ...file, path: file.path || this.publicUrl(file.key) };
-        }
-
-        return file;
+        const path = await this.resolvePath(file);
+        return { ...file, path };
       }),
     );
 
@@ -82,16 +100,8 @@ export class FileService {
     const file = await this.fileRepository.findOne({ where: { id } });
     if (!file) throw new NotFoundException(`File with id ${id} not found`);
 
-    if (file.private && file.key) {
-      const url = await this.getPresignedUrl(file.key, file.bucket);
-      return { ...file, path: url };
-    }
-
-    if (!file.private && file.key) {
-      return { ...file, path: file.path || this.publicUrl(file.key) };
-    }
-
-    return file;
+    const path = await this.resolvePath(file);
+    return { ...file, path };
   }
 
   async uploadFiles(files: Express.Multer.File[], req: AppRequest) {
@@ -106,16 +116,13 @@ export class FileService {
         mf.name = (f as any).filename || f.originalname || 'unknown';
         mf.mimeType = f.mimetype;
 
-        // key/bucket should be present if multer-s3 storage active
         mf.key = s3f.key ?? null;
         mf.bucket = s3f.bucket ?? this.r2.bucket;
-
         mf.private = Boolean(isPrivate);
 
-        // Use FileUtil getPath which already handles local vs s3/r2
+        // Save stored path. For private: FileUtil usually returns key or presign logic later.
         mf.path = FileUtil.getPath(this.configService, f as any);
 
-        // audit fields (optional, if entity has them)
         (mf as any).createdBy = req.user ?? null;
         (mf as any).updatedBy = req.user ?? null;
 
