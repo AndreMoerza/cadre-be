@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { FindManyOptions, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Brand } from './models/entities/brand.entity';
 import { CreateBrandDto } from './common/dtos/create-brand.dto';
 import { UpdateBrandDto } from './common/dtos/update-brand.dto';
@@ -16,8 +16,15 @@ export class BrandService {
     return this.repo.save(e);
   }
 
-  findAll(opts: FindManyOptions<Brand>) {
-    return this.repo.findAndCount(opts);
+  findAll() {
+    return this.repo.findAndCount({
+      relations: {
+        image: true,
+      },
+      order: {
+        name: 'ASC',
+      },
+    });
   }
 
   async findOne(id: string) {

@@ -31,6 +31,22 @@ export class ProductController {
     return result;
   }
 
+  @AppGet(':brandId/:categoryId', {
+    paginated: true,
+    summary: 'Get all product by brand & category',
+  })
+  async findAllByBrandAndCategory(
+    @Param('brandId') brandId: string,
+    @Param('categoryId') categoryId: string,
+    @Pagination() pagination: PaginatedParams,
+  ) {
+    return this.productService.findAllByBrandAndCategory(
+      brandId,
+      categoryId,
+      pagination,
+    );
+  }
+
   @AppGet(':id', {
     summary: 'Get specific product by id',
   })

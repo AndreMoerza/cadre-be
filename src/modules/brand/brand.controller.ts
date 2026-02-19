@@ -8,8 +8,6 @@ import {
   AppPut,
   GuardAccessControl,
 } from '@app/decorators/app.decorator';
-import { Pagination } from '@app/decorators/pagination.decorator';
-import { PaginatedParams } from '@app/interfaces/index.type';
 import { UpdateBrandDto } from './common/dtos/update-brand.dto';
 import { CreateBrandDto } from './common/dtos/create-brand.dto';
 
@@ -26,8 +24,8 @@ export class BrandController {
     paginated: true,
     summary: 'Get all brands',
   })
-  async getProductTypes(@Pagination() pagination: PaginatedParams) {
-    const result = await this.brandService.findAll(pagination);
+  async getProductTypes() {
+    const result = await this.brandService.findAll();
     return result;
   }
 

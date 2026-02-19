@@ -71,11 +71,34 @@ export class ProductService {
     return this.repo.findAndCount({
       ...opts,
       relations: {
+        media: true,
         category: true,
         brand: true,
       },
       where: {
         ...opts.where,
+      },
+    });
+  }
+
+  async findAllByBrandAndCategory(
+    brandId: string,
+    categoryId: string,
+    opts: FindManyOptions<Product>,
+  ) {
+    return this.repo.findAndCount({
+      ...opts,
+      relations: {
+        media: true,
+        brand: true,
+        category: true,
+      },
+      where: {
+        brand: { id: brandId },
+        category: { id: categoryId },
+      },
+      order: {
+        createdAt: 'DESC',
       },
     });
   }

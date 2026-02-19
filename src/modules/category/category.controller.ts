@@ -7,8 +7,6 @@ import {
   AppPut,
   GuardAccessControl,
 } from '@app/decorators/app.decorator';
-import { Pagination } from '@app/decorators/pagination.decorator';
-import { PaginatedParams } from '@app/interfaces/index.type';
 import { CreateCategoryDto } from './common/dtos/create-category.dto';
 import { UpdateCategoryDto } from './common/dtos/update-category.dto';
 import { CategoryService } from './category.service';
@@ -26,8 +24,8 @@ export class CategoryController {
     paginated: true,
     summary: 'Get all productType',
   })
-  async getProductTypes(@Pagination() pagination: PaginatedParams) {
-    const result = await this.categoryService.findAll(pagination);
+  async getProductTypes() {
+    const result = await this.categoryService.findAll();
     return result;
   }
 

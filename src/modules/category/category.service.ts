@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindManyOptions, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Category } from './models/entities/category.entity';
 import { CreateCategoryDto } from './common/dtos/create-category.dto';
 import { UpdateCategoryDto } from './common/dtos/update-category.dto';
@@ -16,8 +16,15 @@ export class CategoryService {
     return this.repo.save(e);
   }
 
-  findAll(opts: FindManyOptions<Category>) {
-    return this.repo.findAndCount(opts);
+  findAll() {
+    return this.repo.findAndCount({
+      relations: {
+        products: true,
+      },
+      order: {
+        name: 'ASC',
+      },
+    });
   }
 
   async findOne(id: string) {
