@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class CreateBrandDto {
   @ApiProperty({ example: 'glo' })
@@ -27,4 +27,8 @@ export class CreateBrandDto {
   @IsString()
   @IsOptional()
   phone?: string;
+
+  @ApiProperty({ example: 'uuid-of-brand' })
+  @IsUUID()
+  imageId!: string;
 }

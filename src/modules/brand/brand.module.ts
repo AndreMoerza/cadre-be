@@ -4,9 +4,10 @@ import { BrandController } from './brand.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BrandProviderModule } from './providers/provider.module';
 import { Brand } from './models/entities/brand.entity';
+import { MediaFile } from '../file/models/entities/file.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Brand]), BrandProviderModule],
+  imports: [TypeOrmModule.forFeature([Brand, MediaFile]), BrandProviderModule],
   providers: [BrandService],
   exports: [],
   controllers: [BrandController],
