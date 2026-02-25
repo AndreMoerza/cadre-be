@@ -22,8 +22,8 @@ export class FileUtil {
     const r2 = configService.getOrThrow('r2');
 
     const vaults = {
-      local: () => {
-        return diskStorage({
+      local: () =>
+        diskStorage({
           destination: (req, file, cb) => {
             const clientPath = (req as any)?.body?.path || null;
 
@@ -32,38 +32,41 @@ export class FileUtil {
               : `./uploads/${file?.mimetype || 'unnamed'}`;
 
             fs.mkdirSync(folder, { recursive: true });
-            return cb(null, folder);
+            cb(null, folder);
           },
+
           filename: (_, file, cb) => {
             const base =
               file?.originalname?.split('.')?.slice(0, -1).join('.') ||
               (file as any)?.filename ||
               'file';
 
-            const fn = `${base}.${Date.now()}${path.extname(file?.originalname)}`;
-            return cb(null, fn);
+            const ext = path.extname(file?.originalname || '');
+            const fn = `${base}.${Date.now()}${ext}`;
+            cb(null, fn);
           },
-        });
-      },
+        }),
 
-      // NOTE: key name "s3" kept for backward compatibility, but points to R2.
       s3: () => {
         const s3Instance = new S3Client({
           region: 'auto',
-          endpoint: r2.endpoint, // https://<accountid>.r2.cloudflarestorage.com
+          endpoint: r2.endpoint, // MUST be r2.cloudflarestorage.com
           credentials: {
             accessKeyId: r2.accessKeyId,
             secretAccessKey: r2.secretAccessKey,
           },
-          forcePathStyle: true, // IMPORTANT for R2
+          forcePathStyle: true,
         });
 
         return multerS3({
-          s3: s3Instance as any, // multer-s3 typings often mismatch
+          s3: s3Instance as any,
           bucket: r2.bucket,
           contentType: multerS3.AUTO_CONTENT_TYPE,
-          metadata: (_req, file, cb) =>
-            cb(null, { originalname: file.originalname }),
+
+          metadata: (_req, file, cb) => {
+            cb(null, { originalname: file.originalname });
+          },
+
           key: (req: Request, file, cb) => {
             const clientPath = (req as any)?.body?.path || null;
 
@@ -76,12 +79,16 @@ export class FileUtil {
               (file as any)?.filename ||
               'file';
 
-            const fn = `${base}.${Date.now()}${path.extname(file?.originalname)}`;
+            const ext = path.extname(file?.originalname || '');
+            const filename = `${base}.${Date.now()}${ext}`;
 
             const prefix = isPrivate ? 'private/files' : 'public/files';
 
-            if (clientPath) return cb(null, `${prefix}/${clientPath}/${fn}`);
-            return cb(null, `${prefix}/${fn}`);
+            if (clientPath) {
+              return cb(null, `${prefix}/${clientPath}/${filename}`);
+            }
+
+            return cb(null, `${prefix}/${filename}`);
           },
         });
       },
@@ -93,13 +100,12 @@ export class FileUtil {
 
         if (!allowed.test(file.originalname)) {
           return callback(
-            new Error(
-              'Only image/video/pdf/xlsx files are allowed (jpg,jpeg,png,gif,webp,mp4,mov,mkv,webm,pdf,xlsx)',
-            ),
+            new Error('Only image/video/pdf/xlsx files are allowed'),
             false,
           );
         }
-        return callback(null, true);
+
+        callback(null, true);
       },
 
       storage: vaults[app.storage](),
@@ -117,28 +123,31 @@ export class FileUtil {
     const app = configService.getOrThrow('app');
     const r2 = configService.getOrThrow('r2');
 
-    const vaults = {
-      local: () => {
-        if (!file) throw new Error('Local file not found');
-        return `${app.domain}/${(file as any).path}`;
-      },
+    if (!file) {
+      throw new Error('File not found');
+    }
 
-      s3: () => {
-        if (!file) throw new Error('S3/R2 file not found');
+    if (app.storage === 'local') {
+      return `${app.domain}/${(file as any).path}`;
+    }
 
-        const f = file as MulterS3File;
+    const f = file as MulterS3File;
 
-        // On some setups location might be undefined
-        if (f.location) return f.location;
+    if (!f.key) {
+      throw new Error('Missing file key (multer-s3 not active)');
+    }
 
-        if (r2.publicBaseUrl && f.key) {
-          return `${r2.publicBaseUrl.replace(/\/$/, '')}/${f.key}`;
-        }
+    // 🔥 IMPORTANT:
+    // Never generate public URL for private object
+    if (f.key.startsWith('private/')) {
+      return f.key; // let service generate presigned later
+    }
 
-        return f.key ?? '';
-      },
-    } as const;
+    // Public object
+    if (r2.publicBaseUrl) {
+      return `${r2.publicBaseUrl.replace(/\/$/, '')}/${f.key}`;
+    }
 
-    return vaults[app.storage]();
+    return f.key;
   }
 }

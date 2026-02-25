@@ -16,7 +16,6 @@ import { CreateBrandDto } from './common/dtos/create-brand.dto';
   path: 'brand',
   version: '1',
 })
-@GuardAccessControl()
 export class BrandController {
   constructor(private readonly brandService: BrandService) {}
 
@@ -40,6 +39,7 @@ export class BrandController {
   @AppPost('', {
     summary: 'Create product brand',
   })
+  @GuardAccessControl()
   async create(@Body() dto: CreateBrandDto) {
     const result = await this.brandService.create(dto);
     return result;
@@ -48,6 +48,7 @@ export class BrandController {
   @AppPut(':id', {
     summary: 'Update brand by id',
   })
+  @GuardAccessControl()
   async update(@Param('id') id: string, @Body() dto: UpdateBrandDto) {
     const result = await this.brandService.update(id, dto);
     return result;
@@ -56,6 +57,7 @@ export class BrandController {
   @AppDel(':id', {
     summary: 'Delete brand by id',
   })
+  @GuardAccessControl()
   async delete(@Param('id') id: string) {
     const result = await this.brandService.remove(id);
     return result;

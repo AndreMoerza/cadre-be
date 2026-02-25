@@ -16,7 +16,6 @@ import { CategoryService } from './category.service';
   path: 'category',
   version: '1',
 })
-@GuardAccessControl()
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
@@ -40,6 +39,7 @@ export class CategoryController {
   @AppPost('', {
     summary: 'Create product category',
   })
+  @GuardAccessControl()
   async create(@Body() dto: CreateCategoryDto) {
     const result = await this.categoryService.create(dto);
     return result;
@@ -48,6 +48,7 @@ export class CategoryController {
   @AppPut(':id', {
     summary: 'Update category by id',
   })
+  @GuardAccessControl()
   async update(@Param('id') id: string, @Body() dto: UpdateCategoryDto) {
     const result = await this.categoryService.update(id, dto);
     return result;
@@ -56,6 +57,7 @@ export class CategoryController {
   @AppDel(':id', {
     summary: 'Delete category by id',
   })
+  @GuardAccessControl()
   async delete(@Param('id') id: string) {
     const result = await this.categoryService.remove(id);
     return result;

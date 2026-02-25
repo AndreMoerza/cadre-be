@@ -18,7 +18,6 @@ import { UpdateProductDto } from '../common/dtos/update-product.dto';
   path: 'product',
   version: '1',
 })
-@GuardAccessControl()
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
@@ -58,6 +57,7 @@ export class ProductController {
   @AppPost('', {
     summary: 'Create product',
   })
+  @GuardAccessControl()
   async create(@Body() dto: CreateProductDto) {
     const result = await this.productService.create(dto);
     return result;
@@ -66,6 +66,7 @@ export class ProductController {
   @AppPut(':id', {
     summary: 'Update product by id',
   })
+  @GuardAccessControl()
   async update(@Param('id') id: string, @Body() dto: UpdateProductDto) {
     const result = await this.productService.update(id, dto);
     return result;
@@ -74,6 +75,7 @@ export class ProductController {
   @AppDel(':id', {
     summary: 'Delete product by id',
   })
+  @GuardAccessControl()
   async delete(@Param('id') id: string) {
     const result = await this.productService.remove(id);
     return result;
